@@ -1,0 +1,62 @@
+name: mosh
+version: '1.3.0'
+summary: mobile-shell (mosh)
+description: |
+  Remote terminal application that allows roaming, supports intermittent
+  connectivity, and provides intelligent local echo and line editing of user
+  keystrokes.
+  Mosh is a replacement for SSH. It's more robust and responsive, especially
+  over Wi-Fi, cellular, and long-distance links.
+
+
+grade: devel
+confinement: classic
+
+apps:
+  mosh:
+    command: bin/mosh
+    plugs:
+      - network
+      - network-bind
+      - home
+    environment:
+      LC_ALL: C.UTF-8
+
+  mosh-client:
+    command: bin/with_snap_arch_triplet env LD_LIBRARY_PATH=$SNAP/usr/lib/$SNAP_ARCH_TRIPLET $SNAP/bin/mosh-client
+    plugs:
+      - home
+      - network
+      - network-bind
+    environment:
+      LC_ALL: C.UTF-8
+
+  mosh-server:
+    command: bin/with_snap_arch_triplet env LD_LIBRARY_PATH=$SNAP/usr/lib/$SNAP_ARCH_TRIPLET $SNAP/bin/mosh-server
+    plugs:
+      - home
+      - network
+      - network-bind
+    environment:
+      LC_ALL: C.UTF-8
+
+parts:
+  mosh:
+    plugin: autotools
+    source: https://github.com/mobile-shell/mosh/releases/download/mosh-1.3.0/mosh-1.3.0.tar.gz
+    build-packages:
+      - pkg-config
+      - perl
+      - g++
+      - protobuf-compiler
+    stage-packages:
+      - libncurses5-dev
+      - libprotobuf-dev
+      - libssl-dev
+      - libutempter-dev
+      - zlib1g-dev
+      - locales-all
+
+  snap-arch-triplet-generator:
+    plugin: dump
+    source: src/
